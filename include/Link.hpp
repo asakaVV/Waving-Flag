@@ -4,7 +4,7 @@
 
 class Link {
 public:
-    Link(PMat *M1, PMat *M2, double k, double z);
+    Link(PMat *M1, PMat *M2, double k, double z, float r, float g, float b);
     void update();
     void update_gravity(double gravity);
     void update_wind(double wind);
@@ -17,4 +17,7 @@ private:
     double k;
     double z;
     double l0;
+    float r;
+    float g;
+    float b;
 };

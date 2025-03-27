@@ -2,7 +2,7 @@
 
 #include <gfl.h>
 
-Link::Link(PMat *M1, PMat *M2, double k, double z) : M1(M1), M2(M2), k(k), z(z)
+Link::Link(PMat *M1, PMat *M2, double k, double z, float r, float g, float b) : M1(M1), M2(M2), k(k), z(z), r(r), g(g), b(b)
 {
     l0 = M1->getPos().dist(M2->getPos());
 }
@@ -23,7 +23,7 @@ void Link::draw() const
     auto p2 = M2->getPos();
     GFLpoint A = {p1.getX(), p1.getY()};
     GFLpoint B = {p2.getX(), p2.getY()};
-    GFLcolor c = {0, 0, 1};
+    GFLcolor c = {r, g, b};
     gfl_DrawLine(A, B, c, 2);
 }
 

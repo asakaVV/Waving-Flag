@@ -36,7 +36,7 @@ std::vector<PMat> pmats;
 std::vector<Link> links;
 PMat ref = PMat(0, Point(0, 0, 0), Vect(0, 0, 0), 0);
 std::vector<Link> gravity;
-double viscosite = 0.1f;
+double viscosite = 0.002f;
 std::vector<Link> poutre;
 double gravity_value = 98.;
 std::vector<Link> wind;
@@ -58,7 +58,7 @@ static void init(void)
   int rows = 40;                // Nombre de lignes
   int cols = 60;                // Nombre de colonnes
   double spacing = 0.5;         // Espacement entre les points
-  double k = 0.1f * Fe * Fe;   // Constante de raideur
+  double k = 0.01f * Fe * Fe;   // Constante de raideur
   double amor = viscosite * Fe; // Constante d'amortissement
 
   
@@ -74,7 +74,7 @@ static void init(void)
       int type = (j == 0) ? 0 : 2; // Fixer uniquement le premier point de chaque ligne
 
       double coeff = 1.0 - 0.9 * j / (cols - 1) + 0.75;
-      pmats.push_back(PMat(coeff , Point(x, y, z), Vect(0, 0, 0), type));
+      pmats.push_back(PMat(1 , Point(x, y, z), Vect(0, 0, 0), type));
     }
   }
 
@@ -85,7 +85,7 @@ static void init(void)
     {
       int idx = i * cols + j;
       double coeff = 1.0 - 0.9 * j / (cols - 1);
-      links.push_back(Link(&pmats[idx], &pmats[idx + 1], k * coeff, amor));
+      links.push_back(Link(&pmats[idx], &pmats[idx + 1], k * 15, amor, 0.5, 0.5, 0.0));
     }
   }
 
@@ -96,7 +96,7 @@ static void init(void)
     {
       int idx = i * cols + j;
       double coeff = 1.0 - 0.9 * j / (cols - 1);
-      links.push_back(Link(&pmats[idx], &pmats[idx + cols], k * coeff, amor));
+      links.push_back(Link(&pmats[idx], &pmats[idx + cols], k, amor, 0.5, 0.0, 0.5));
     }
   }
 
@@ -107,8 +107,8 @@ static void init(void)
     {
       int idx = i * cols + j;
       double coeff = 1.0 - 0.9 * j / (cols - 1);
-      links.push_back(Link(&pmats[idx], &pmats[idx + cols + 1], k * coeff, amor)); // Diagonale droite
-      links.push_back(Link(&pmats[idx + 1], &pmats[idx + cols], k * coeff, amor)); // Diagonale gauche
+      links.push_back(Link(&pmats[idx], &pmats[idx + cols + 1], k, amor * 5, 0.0, 0.5, 0.5)); // Diagonale droite
+      links.push_back(Link(&pmats[idx + 1], &pmats[idx + cols], k, amor * 5, 0.0, 0.5, 0.5)); // Diagonale gauche
     }
   }
 
@@ -119,7 +119,7 @@ static void init(void)
     { // Sauter un point
       int idx = i * cols + j;
       double coeff = 1.0 - 0.9 * j / (cols - 1);
-      links.push_back(Link(&pmats[idx], &pmats[idx + 2], k * coeff, amor));
+      links.push_back(Link(&pmats[idx], &pmats[idx + 2], k * 15, amor, 0.5, 0.5, 0.0));
     }
   }
 
@@ -130,7 +130,7 @@ static void init(void)
     {
       int idx = i * cols + j;
       double coeff = 1.0 - 0.9 * j / (cols - 1);
-      links.push_back(Link(&pmats[idx], &pmats[idx + 2 * cols], k * coeff, amor));
+      links.push_back(Link(&pmats[idx], &pmats[idx + 2 * cols], k, amor, 0.5, 0.0, 0.5));
     }
   }
 
@@ -140,7 +140,7 @@ static void init(void)
     for (int j = 0; j < rows; j++)
     {
       int idx = j * cols + i;
-      gravity.push_back(Link(&pmats[idx], &ref, k, amor));
+      gravity.push_back(Link(&pmats[idx], &ref, k, amor, 0.5, 0.5, 0.0));
     }
   }
   // Vent
@@ -149,7 +149,7 @@ static void init(void)
     for (int j = 0; j < rows; j++)
     {
       int idx = j * cols + i;
-      wind.push_back(Link(&pmats[idx], &ref, k, amor));
+      wind.push_back(Link(&pmats[idx], &ref, k, amor, 0.5, 0.5, 0.0));
     }
   }
 }
