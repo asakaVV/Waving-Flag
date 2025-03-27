@@ -10,6 +10,9 @@
 
 #include <vector>
 #include <iostream>
+#include <chrono>
+#include <cstdlib>
+#include <ctime>
 
 #include "../include/PMat.hpp"
 #include "../include/Link.hpp"
@@ -35,7 +38,11 @@ PMat ref = PMat(0, Point(0, 0, 0), Vect(0, 0, 0), 0);
 std::vector<Link> gravity;
 double viscosite = 0.1f;
 std::vector<Link> poutre;
-double gravity_value = 9.8;
+double gravity_value = 98.;
+std::vector<Link> wind;
+
+auto start = std::time(nullptr);
+
 
 /* la fonction d'initialisation : appelée 1 seule fois, au début     */
 static void init(void)
@@ -48,11 +55,13 @@ static void init(void)
    *   Tout ce qu'il y a ici pourrait être écrit directement dans le main()
    *   juste après l'appel à gfl_InitWindow()
   !*/
-  int rows = 30;                // Nombre de lignes
-  int cols = 45;                // Nombre de colonnes
+  int rows = 40;                // Nombre de lignes
+  int cols = 60;                // Nombre de colonnes
   double spacing = 0.5;         // Espacement entre les points
-  double k = 0.05f * Fe * Fe;   // Constante de raideur
+  double k = 0.1f * Fe * Fe;   // Constante de raideur
   double amor = viscosite * Fe; // Constante d'amortissement
+
+  
 
   // Création des points
   for (int i = 0; i < rows; i++)
@@ -63,7 +72,9 @@ static void init(void)
       double y = -i * spacing;
       double z = 0;
       int type = (j == 0) ? 0 : 2; // Fixer uniquement le premier point de chaque ligne
-      pmats.push_back(PMat(1, Point(x, y, z), Vect(0, 0, 0), type));
+
+      double coeff = 1.0 - 0.9 * j / (cols - 1) + 0.75;
+      pmats.push_back(PMat(coeff , Point(x, y, z), Vect(0, 0, 0), type));
     }
   }
 
@@ -73,7 +84,8 @@ static void init(void)
     for (int j = 0; j < cols - 1; j++)
     {
       int idx = i * cols + j;
-      links.push_back(Link(&pmats[idx], &pmats[idx + 1], k, amor));
+      double coeff = 1.0 - 0.9 * j / (cols - 1);
+      links.push_back(Link(&pmats[idx], &pmats[idx + 1], k * coeff, amor));
     }
   }
 
@@ -83,7 +95,8 @@ static void init(void)
     for (int j = 0; j < cols; j++)
     {
       int idx = i * cols + j;
-      links.push_back(Link(&pmats[idx], &pmats[idx + cols], k, amor));
+      double coeff = 1.0 - 0.9 * j / (cols - 1);
+      links.push_back(Link(&pmats[idx], &pmats[idx + cols], k * coeff, amor));
     }
   }
 
@@ -93,8 +106,9 @@ static void init(void)
     for (int j = 0; j < cols - 1; j++)
     {
       int idx = i * cols + j;
-      links.push_back(Link(&pmats[idx], &pmats[idx + cols + 1], k, amor)); // Diagonale droite
-      links.push_back(Link(&pmats[idx + 1], &pmats[idx + cols], k, amor)); // Diagonale gauche
+      double coeff = 1.0 - 0.9 * j / (cols - 1);
+      links.push_back(Link(&pmats[idx], &pmats[idx + cols + 1], k * coeff, amor)); // Diagonale droite
+      links.push_back(Link(&pmats[idx + 1], &pmats[idx + cols], k * coeff, amor)); // Diagonale gauche
     }
   }
 
@@ -104,7 +118,8 @@ static void init(void)
     for (int j = 0; j < cols - 2; j++)
     { // Sauter un point
       int idx = i * cols + j;
-      links.push_back(Link(&pmats[idx], &pmats[idx + 2], k, amor));
+      double coeff = 1.0 - 0.9 * j / (cols - 1);
+      links.push_back(Link(&pmats[idx], &pmats[idx + 2], k * coeff, amor));
     }
   }
 
@@ -114,7 +129,8 @@ static void init(void)
     for (int j = 0; j < cols; j++)
     {
       int idx = i * cols + j;
-      links.push_back(Link(&pmats[idx], &pmats[idx + 2 * cols], k, amor));
+      double coeff = 1.0 - 0.9 * j / (cols - 1);
+      links.push_back(Link(&pmats[idx], &pmats[idx + 2 * cols], k * coeff, amor));
     }
   }
 
@@ -125,6 +141,15 @@ static void init(void)
     {
       int idx = j * cols + i;
       gravity.push_back(Link(&pmats[idx], &ref, k, amor));
+    }
+  }
+  // Vent
+  for (int i = 0; i < cols; i++)
+  {
+    for (int j = 0; j < rows; j++)
+    {
+      int idx = j * cols + i;
+      wind.push_back(Link(&pmats[idx], &ref, k, amor));
     }
   }
 }
@@ -198,6 +223,19 @@ static void anim(void)
   {
     link.update();
   }
+  
+  auto now = std::time(nullptr);
+  if (now - start > 2)
+  {
+    for (auto &link : wind)
+    {
+      link.update_wind(rand() % (500 - 100 + 1) + 100);
+    }
+    if (now - start > 4)
+    {
+      start = now;
+    }
+  }
 }
 
 /* la fonction de sortie  (facultatif) */
@@ -216,6 +254,7 @@ static void quit(void)
 /***************************************************************************/
 int main(int argc, char **argv)
 {
+  std::srand(std::time(nullptr)); 
   /* 1°) creation de la fenetre - titre et tailles (pixels)  */
   gfl_InitWindow(*argv, WWIDTH, WHEIGHT);
   /* 2°) définition de la zone de travail en coord. réeelles *

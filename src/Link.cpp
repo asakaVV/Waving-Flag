@@ -32,3 +32,9 @@ void Link::update_gravity(double gravity)
     M1->addForce(Vect(0, -gravity, 0));
     M2->addForce(Vect(0, -gravity, 0));
 }
+
+void Link::update_wind(double wind)
+{
+    M1->addForce(Vect(wind, 0, 0));
+    M2->addForce(Vect(wind, 0, 0));
+}
