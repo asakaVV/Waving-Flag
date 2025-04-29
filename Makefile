@@ -19,7 +19,7 @@ endif
 SRC = src/
 INCLUDE = include/
 
-ALL = corde
+ALL = flag
 
 DEPS = Link.o PMat.o Point.o Vect.o
 

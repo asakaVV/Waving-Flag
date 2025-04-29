@@ -73,7 +73,6 @@ static void init(void)
       double z = 0;
       int type = (j == 0) ? 0 : 2; // Fixer uniquement le premier point de chaque ligne
 
-      double coeff = 1.0 - 0.9 * j / (cols - 1) + 0.75;
       pmats.push_back(PMat(1 , Point(x, y, z), Vect(0, 0, 0), type));
     }
   }
@@ -84,7 +83,6 @@ static void init(void)
     for (int j = 0; j < cols - 1; j++)
     {
       int idx = i * cols + j;
-      double coeff = 1.0 - 0.9 * j / (cols - 1);
       links.push_back(Link(&pmats[idx], &pmats[idx + 1], k * 15, amor, 0.5, 0.5, 0.0));
     }
   }
@@ -95,7 +93,6 @@ static void init(void)
     for (int j = 0; j < cols; j++)
     {
       int idx = i * cols + j;
-      double coeff = 1.0 - 0.9 * j / (cols - 1);
       links.push_back(Link(&pmats[idx], &pmats[idx + cols], k, amor, 0.5, 0.0, 0.5));
     }
   }
@@ -106,7 +103,6 @@ static void init(void)
     for (int j = 0; j < cols - 1; j++)
     {
       int idx = i * cols + j;
-      double coeff = 1.0 - 0.9 * j / (cols - 1);
       links.push_back(Link(&pmats[idx], &pmats[idx + cols + 1], k, amor * 5, 0.0, 0.5, 0.5)); // Diagonale droite
       links.push_back(Link(&pmats[idx + 1], &pmats[idx + cols], k, amor * 5, 0.0, 0.5, 0.5)); // Diagonale gauche
     }
@@ -118,8 +114,7 @@ static void init(void)
     for (int j = 0; j < cols - 2; j++)
     { // Sauter un point
       int idx = i * cols + j;
-      double coeff = 1.0 - 0.9 * j / (cols - 1);
-      links.push_back(Link(&pmats[idx], &pmats[idx + 2], k * 15, amor, 0.5, 0.5, 0.0));
+      poutre.push_back(Link(&pmats[idx], &pmats[idx + 2], k * 25, amor, 0.5, 0.5, 0.0));
     }
   }
 
@@ -129,8 +124,7 @@ static void init(void)
     for (int j = 0; j < cols; j++)
     {
       int idx = i * cols + j;
-      double coeff = 1.0 - 0.9 * j / (cols - 1);
-      links.push_back(Link(&pmats[idx], &pmats[idx + 2 * cols], k, amor, 0.5, 0.0, 0.5));
+      poutre.push_back(Link(&pmats[idx], &pmats[idx + 2 * cols], k, amor, 0.5, 0.0, 0.5));
     }
   }
 
