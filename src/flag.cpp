@@ -44,7 +44,7 @@ std::vector<Link> wind;
 
 auto start = std::time(nullptr);
 
-GridCollision gridCollision(1.0);
+GridCollision gridCollision(0.1);
 
 /* la fonction d'initialisation : appelée 1 seule fois, au début     */
 static void init(void)
