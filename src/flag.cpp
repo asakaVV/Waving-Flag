@@ -16,6 +16,7 @@
 
 #include "../include/PMat.hpp"
 #include "../include/Link.hpp"
+#include "../include/GridCollision.hpp"
 
 /* tailles initiales de la fenêtre graphique (en pixels)     */
 #define WWIDTH 720
@@ -43,6 +44,7 @@ std::vector<Link> wind;
 
 auto start = std::time(nullptr);
 
+GridCollision gridCollision(1.0);
 
 /* la fonction d'initialisation : appelée 1 seule fois, au début     */
 static void init(void)
@@ -127,6 +129,9 @@ static void init(void)
       poutre.push_back(Link(&pmats[idx], &pmats[idx + 2 * cols], k, amor, 0.5, 0.0, 0.5));
     }
   }
+
+  gridCollision.updateGrid(pmats);
+  auto collisions = gridCollision.detectCollisions();
 
   // Gravité
   for (int i = 0; i < cols; i++)

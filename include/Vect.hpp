@@ -22,6 +22,8 @@ public:
     Vect operator-();
     Vect operator-(const Vect &v);
 
+    double norm() const;
+
 private:
     double x;
     double y;
