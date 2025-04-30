@@ -15,16 +15,20 @@ std::vector<std::pair<PMat*, PMat*>> GridCollision::detectCollisions() {
     std::vector<std::pair<PMat*, PMat*>> collisions;
 
     for (const auto& [cell, particles] : grid) {
-        // Check collisions within the same cell
         for (size_t i = 0; i < particles.size(); ++i) {
             for (size_t j = i + 1; j < particles.size(); ++j) {
-                if (particles[i]->getPos().dist(particles[j]->getPos()) < cellSize) {
+                double distance = particles[i]->getPos().dist(particles[j]->getPos());
+                if (distance < cellSize) {
                     collisions.emplace_back(particles[i], particles[j]);
+
+                    Vect direction = (particles[j]->getPos() - particles[i]->getPos()) / distance;
+                    Vect repulsiveForce = direction * (cellSize - distance) * 10.0; // Arbitrary strength
+                    particles[i]->addForce(-repulsiveForce);
+                    particles[j]->addForce(repulsiveForce);
                 }
             }
         }
 
-        // Check collisions with neighboring cells
         for (int dx = -1; dx <= 1; ++dx) {
             for (int dy = -1; dy <= 1; ++dy) {
                 for (int dz = -1; dz <= 1; ++dz) {
@@ -39,8 +43,14 @@ std::vector<std::pair<PMat*, PMat*>> GridCollision::detectCollisions() {
                     if (grid.find(neighborCell) != grid.end()) {
                         for (auto* p1 : particles) {
                             for (auto* p2 : grid[neighborCell]) {
-                                if (p1->getPos().dist(p2->getPos()) < cellSize) {
+                                double distance = p1->getPos().dist(p2->getPos());
+                                if (distance < cellSize) {
                                     collisions.emplace_back(p1, p2);
+
+                                    Vect direction = (p2->getPos() - p1->getPos()) / distance;
+                                    Vect repulsiveForce = direction * (cellSize - distance) * 10.0; // Arbitrary strength
+                                    p1->addForce(-repulsiveForce);
+                                    p2->addForce(repulsiveForce);
                                 }
                             }
                         }

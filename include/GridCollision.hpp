@@ -6,7 +6,6 @@
 #include <tuple>
 #include <functional>
 
-// Spécialisation de std::hash pour std::tuple<int, int, int>
 namespace std {
     template <>
     struct hash<std::tuple<int, int, int>> {
@@ -15,7 +14,7 @@ namespace std {
             std::size_t h1 = std::hash<int>{}(x);
             std::size_t h2 = std::hash<int>{}(y);
             std::size_t h3 = std::hash<int>{}(z);
-            return h1 ^ (h2 << 1) ^ (h3 << 2); // Combine les hachages
+            return h1 ^ (h2 << 1) ^ (h3 << 2);
         }
     };
 }
